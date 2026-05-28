@@ -1,0 +1,45 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    
+    - name: Test with pytest
+      run: pytest
+    
+    - name: Ejecutar la app
+      run: python app.py
+    
+    - name: Simular el deploy
+      run: echo "Desplegando la APP"
+    
+    - name: Costruir imagen de docker
+      run: docker build -t ghcr.io/luisy2032/pythonhola:1.0.0 .
+    
+    - name: Login en GitHub Container Registry
+      run: echo "${{ secrets.GHCR_PATH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    
+    - name: Publicar la imagen creada
+      run: docker push ghcr.io/luisy2032/pythonhola:1.0.0
